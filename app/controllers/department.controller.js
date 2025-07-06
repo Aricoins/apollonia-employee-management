@@ -32,20 +32,23 @@ exports.create = async (req, res) => {
 exports.findAll = async (req, res) => {
   try {
     console.log('Obteniendo todos los departamentos...');
-    
     const departments = await Department.find().sort({ name: 1 });
     console.log(`Encontrados ${departments.length} departamentos`);
-    
     res.status(200).json({
       success: true,
       count: departments.length,
       data: departments
     });
   } catch (error) {
+    // LOG DETALLADO PARA DEBUG EN PRODUCCIÓN
     console.error('Error obteniendo departamentos:', error);
+    if (error instanceof mongoose.Error) {
+      console.error('Mongoose error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    }
     res.status(500).json({
       success: false,
-      message: error.message || 'Error al obtener departamentos'
+      message: error.message || 'Error al obtener departamentos',
+      error: error.stack || error
     });
   }
 };
