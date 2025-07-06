@@ -1,6 +1,10 @@
 # Apollonia Dental Practice - Employee Management System
 
-## 📋 Project Overview
+## � Quick Access
+- **🌐 Live Demo**: https://apollonia-employee-management-1wy2escvh-aricoins-projects.vercel.app
+- **📂 GitHub Repository**: [Create and link your GitHub repo]
+
+## �📋 Project Overview
 
 This is a complete CRUD (Create, Read, Update, Delete) application for managing employees and departments at Apollonia Dental Practice. The application demonstrates professional-grade web development using Node.js, MongoDB, Express.js, and Docker.
 
