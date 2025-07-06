@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apollonia Dental Practice - Employee Management</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🦷 Apollonia Dental Practice</h1>
+            <p>Sistema de Gestión de Empleados</p>
+        </header>
+
+        <div class="status-section">
+            <h2>Estado del Sistema</h2>
+            <div id="status" class="status-message">Verificando conexión...</div>
+            <div class="button-group">
+                <button onclick="testAPI()" class="btn">Probar API</button>
+                <button onclick="loadDepartments()" class="btn">Cargar Departamentos</button>
+                <button onclick="loadEmployees()" class="btn">Cargar Empleados</button>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>Información del Proyecto</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>👥 Empleados</h3>
+                    <p>10 miembros del personal médico</p>
+                </div>
+                <div class="info-card">
+                    <h3>🏥 Departamentos</h3>
+                    <p>5 especializaciones dentales</p>
+                </div>
+                <div class="info-card">
+                    <h3>⚙️ Funcionalidades</h3>
+                    <p>CRUD completo para empleados y departamentos</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <div class="data-container">
+                <div class="section-header">
+                    <h3>Departamentos</h3>
+                    <button onclick="showCreateDepartmentForm()" class="btn btn-primary">+ Nuevo Departamento</button>
+                </div>
+                <div id="departments-list" class="data-list"></div>
+            </div>
+            
+            <div class="data-container">
+                <div class="section-header">
+                    <h3>Empleados</h3>
+                    <button onclick="showCreateEmployeeForm()" class="btn btn-primary">+ Nuevo Empleado</button>
+                </div>
+                <div id="employees-list" class="data-list"></div>
+            </div>
+        </div>
+
+        <!-- Modal para formularios -->
+        <div id="modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <div id="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
