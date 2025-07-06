@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Department = require('../models/department.model');
 const Employee = require('../models/employee.model');
 
