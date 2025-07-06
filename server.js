@@ -80,6 +80,33 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+// Endpoint de prueba de conexión a MongoDB Atlas
+app.get('/api/ping', async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    const state = mongoose.connection.readyState;
+    let status = 'desconocido';
+    if (state === 0) status = 'desconectado';
+    if (state === 1) status = 'conectado';
+    if (state === 2) status = 'conectando';
+    if (state === 3) status = 'desconectando';
+    res.json({
+      success: true,
+      message: 'Ping exitoso',
+      mongoState: status,
+      dbName: mongoose.connection.name,
+      host: mongoose.connection.host,
+      uri: process.env.MONGODB_ATLAS_URI || process.env.MONGODB_URI
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      error: error.stack
+    });
+  }
+});
+
 // Ruta principal
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
