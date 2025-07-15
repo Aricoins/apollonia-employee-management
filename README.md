@@ -301,7 +301,7 @@ The project is production-ready and can be easily extended with additional featu
 
 ---
 
-**Project Author**: [Your Name]
-**Course**: [Course Name]
+**Project Author**: Ariel Rogel.
+**Course**: Coursera Project Network
 **Date**: July 2025
 **Technologies**: Node.js, Express.js, MongoDB, Docker, HTML5, CSS3, JavaScript
