@@ -6,13 +6,7 @@ const departmentSchema = new mongoose.Schema({
     required: [true, 'El nombre del departamento es requerido'],
     unique: true,
     trim: true,
-    enum: [
-      'General Dentistry',
-      'Pediatric Dentistry', 
-      'Restorative Dentistry',
-      'Surgery',
-      'Orthodontics'
-    ]
+    maxlength: [100, 'El nombre no puede exceder 100 caracteres']
   },
   description: {
     type: String,

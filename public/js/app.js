@@ -148,17 +148,17 @@ function closeModal() {
 // =====================
 
 async function showCreateDepartmentForm() {
-    const departments = ['General Dentistry', 'Pediatric Dentistry', 'Restorative Dentistry', 'Surgery', 'Orthodontics'];
+    const suggestedDepartments = ['General Dentistry', 'Pediatric Dentistry', 'Restorative Dentistry', 'Surgery', 'Orthodontics'];
     
     const content = `
         <form id="department-form" class="crud-form">
             <h4>Crear Nuevo Departamento</h4>
             <div class="form-group">
                 <label for="dept-name">Nombre del Departamento:</label>
-                <select id="dept-name" required>
-                    <option value="">Seleccionar departamento</option>
-                    ${departments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
-                </select>
+                <input type="text" id="dept-name" list="dept-suggestions" required maxlength="100" placeholder="Escribir o seleccionar departamento">
+                <datalist id="dept-suggestions">
+                    ${suggestedDepartments.map(dept => `<option value="${dept}">`).join('')}
+                </datalist>
             </div>
             <div class="form-group">
                 <label for="dept-description">Descripción:</label>
@@ -208,16 +208,17 @@ async function editDepartment(id) {
         const response = await apiRequest(`/api/departments/${id}`);
         const dept = response.data;
         
-        const departments = ['General Dentistry', 'Pediatric Dentistry', 'Restorative Dentistry', 'Surgery', 'Orthodontics'];
+        const suggestedDepartments = ['General Dentistry', 'Pediatric Dentistry', 'Restorative Dentistry', 'Surgery', 'Orthodontics'];
         
         const content = `
             <form id="department-form" class="crud-form">
                 <h4>Editar Departamento</h4>
                 <div class="form-group">
                     <label for="dept-name">Nombre del Departamento:</label>
-                    <select id="dept-name" required>
-                        ${departments.map(d => `<option value="${d}" ${d === dept.name ? 'selected' : ''}>${d}</option>`).join('')}
-                    </select>
+                    <input type="text" id="dept-name" list="dept-suggestions" value="${dept.name}" required maxlength="100" placeholder="Escribir o seleccionar departamento">
+                    <datalist id="dept-suggestions">
+                        ${suggestedDepartments.map(d => `<option value="${d}">`).join('')}
+                    </datalist>
                 </div>
                 <div class="form-group">
                     <label for="dept-description">Descripción:</label>

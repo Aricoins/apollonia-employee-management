@@ -56,14 +56,9 @@ exports.validateDepartment = [
   body('name')
     .notEmpty()
     .withMessage('El nombre del departamento es requerido')
-    .isIn([
-      'General Dentistry',
-      'Pediatric Dentistry',
-      'Restorative Dentistry',
-      'Surgery',
-      'Orthodontics'
-    ])
-    .withMessage('Departamento inválido. Debe ser uno de: General Dentistry, Pediatric Dentistry, Restorative Dentistry, Surgery, Orthodontics'),
+    .isLength({ min: 2, max: 100 })
+    .withMessage('El nombre debe tener entre 2 y 100 caracteres')
+    .trim(),
   
   body('description')
     .optional()
