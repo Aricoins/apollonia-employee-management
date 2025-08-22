@@ -13,30 +13,28 @@ app.use(express.urlencoded({ extended: true }));
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Conectar a MongoDB
+// Estado de la base de datos
 let dbConnected = false;
-let dbConnection = null;
+let mongoose;
 
-const { connectDB } = require('./app/config/database');
-
-const initDatabase = async () => {
+// Inicializar la base de datos
+async function initDatabase() {
   try {
-    dbConnection = await connectDB();
-    if (dbConnection) {
-      dbConnected = true;
-      console.log('✅ Base de datos conectada y lista');
-    } else {
-      throw new Error('No se pudo establecer la conexión');
-    }
+    const { connectDB } = require('./app/config/database');
+    await connectDB();
+    mongoose = require('mongoose');
+    dbConnected = mongoose.connection.readyState === 1;
+    console.log('✅ Base de datos conectada y lista');
   } catch (error) {
-    console.log('⚠️  Error al conectar a la base de datos:', error.message);
+    console.error('⚠️  Error al conectar a la base de datos:', error.message);
     if (process.env.NODE_ENV === 'production') {
       throw error;
     } else {
       console.log('⚠️  Ejecutando en modo fallback');
+      dbConnected = false;
     }
   }
-};
+}
 
 // Inicializar la base de datos
 initDatabase();
@@ -97,7 +95,7 @@ app.get('/api/test', (req, res) => {
 // Endpoint de prueba de conexión a MongoDB Atlas
 app.get('/api/ping', async (req, res) => {
   try {
-    const mongoose = require('mongoose');
+    if (!mongoose) mongoose = require('mongoose');
     const state = mongoose.connection.readyState;
     let status = 'desconocido';
     if (state === 0) status = 'desconectado';
