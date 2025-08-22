@@ -51,15 +51,31 @@ exports.findAll = async (req, res) => {
   try {
     console.log('Obteniendo todos los empleados...');
     
+    // Obtener parámetros de paginación
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    
+    // Obtener el total de empleados
+    const totalEmployees = await Employee.countDocuments();
+    
+    // Obtener empleados con paginación
     const employees = await Employee.find()
       .populate('department', 'name description')
-      .sort({ lastName: 1, firstName: 1 });
+      .sort({ lastName: 1, firstName: 1 })
+      .skip(skip)
+      .limit(limit);
     
-    console.log(`Encontrados ${employees.length} empleados`);
+    console.log(`Encontrados ${employees.length} empleados de ${totalEmployees} total`);
     
     res.status(200).json({
       success: true,
       count: employees.length,
+      total: totalEmployees,
+      currentPage: page,
+      totalPages: Math.ceil(totalEmployees / limit),
+      hasNextPage: page < Math.ceil(totalEmployees / limit),
+      hasPrevPage: page > 1,
       data: employees
     });
   } catch (error) {

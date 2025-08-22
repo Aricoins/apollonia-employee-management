@@ -33,11 +33,31 @@ exports.create = async (req, res) => {
 exports.findAll = async (req, res) => {
   try {
     console.log('Obteniendo todos los departamentos...');
-    const departments = await Department.find().sort({ name: 1 });
-    console.log(`Encontrados ${departments.length} departamentos`);
+    
+    // Obtener parámetros de paginación
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    
+    // Obtener el total de departamentos
+    const totalDepartments = await Department.countDocuments();
+    
+    // Obtener departamentos con paginación
+    const departments = await Department.find()
+      .sort({ name: 1 })
+      .skip(skip)
+      .limit(limit);
+    
+    console.log(`Encontrados ${departments.length} departamentos de ${totalDepartments} total`);
+    
     res.status(200).json({
       success: true,
       count: departments.length,
+      total: totalDepartments,
+      currentPage: page,
+      totalPages: Math.ceil(totalDepartments / limit),
+      hasNextPage: page < Math.ceil(totalDepartments / limit),
+      hasPrevPage: page > 1,
       data: departments
     });
   } catch (error) {

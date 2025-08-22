@@ -1,9 +1,15 @@
 // Estado de la aplicación
 const app = {
     apiBase: '',
-    departments: [],
+    departments: [], // Para paginación en la vista principal
+    allDepartments: [], // Para selects de formularios
     employees: [],
-    editingItem: null
+    editingItem: null,
+    pagination: {
+        departmentsPage: 1,
+        employeesPage: 1,
+        limit: 5
+    }
 };
 
 // Función para mostrar mensajes de estado
@@ -65,16 +71,17 @@ async function testAPI() {
 }
 
 // Cargar y mostrar departamentos
-async function loadDepartments() {
+async function loadDepartments(page = 1) {
     const container = document.getElementById('departments-list');
     container.innerHTML = '<div class="loading">Cargando departamentos...</div>';
     
     try {
-        const data = await apiRequest('/api/departments');
+        app.pagination.departmentsPage = page;
+        const data = await apiRequest(`/api/departments?page=${page}&limit=${app.pagination.limit}`);
         app.departments = data.data;
         
         if (data.data && data.data.length > 0) {
-            container.innerHTML = data.data.map(dept => `
+            let html = data.data.map(dept => `
                 <div class="data-item">
                     <strong>${dept.name}</strong>
                     <br><small>${dept.description || 'Sin descripción'}</small>
@@ -84,31 +91,36 @@ async function loadDepartments() {
                     </div>
                 </div>
             `).join('');
-            showStatus(`✅ ${data.data.length} departamentos cargados`, 'success');
+            
+            // Agregar controles de paginación
+            html += createPaginationControls(data, 'especialidades');
+            container.innerHTML = html;
+            showStatus(`✅ ${data.total} especialidades disponibles`, 'success');
         } else {
-            container.innerHTML = '<div class="error">No hay departamentos disponibles</div>';
+            container.innerHTML = '<div class="error">No hay especialidades disponibles</div>';
         }
     } catch (error) {
         container.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-        showStatus(`❌ Error cargando departamentos: ${error.message}`, 'error');
+        showStatus(`❌ Error cargando especialidades: ${error.message}`, 'error');
     }
 }
 
 // Cargar y mostrar empleados
-async function loadEmployees() {
+async function loadEmployees(page = 1) {
     const container = document.getElementById('employees-list');
     container.innerHTML = '<div class="loading">Cargando empleados...</div>';
     
     try {
-        const data = await apiRequest('/api/employees');
+        app.pagination.employeesPage = page;
+        const data = await apiRequest(`/api/employees?page=${page}&limit=${app.pagination.limit}`);
         app.employees = data.data;
         
         if (data.data && data.data.length > 0) {
-            container.innerHTML = data.data.map(emp => `
+            let html = data.data.map(emp => `
                 <div class="data-item">
                     <strong>${emp.firstName} ${emp.lastName}</strong>
-                    <br><small>Departamento: ${emp.department ? emp.department.name : 'Sin departamento'}</small>
-                    <br><small>Posición: ${emp.position || 'Sin posición'}</small>
+                    <br><small>Especialidad: ${emp.department ? emp.department.name : 'Sin especialidad'}</small>
+                    <br><small>Cargo: ${emp.position || 'Sin cargo'}</small>
                     ${emp.email ? `<br><small>Email: ${emp.email}</small>` : ''}
                     <div class="actions">
                         <button onclick="editEmployee('${emp._id}')" class="btn btn-warning btn-small">Editar</button>
@@ -116,13 +128,17 @@ async function loadEmployees() {
                     </div>
                 </div>
             `).join('');
-            showStatus(`✅ ${data.data.length} empleados cargados`, 'success');
+            
+            // Agregar controles de paginación
+            html += createPaginationControls(data, 'profesionales');
+            container.innerHTML = html;
+            showStatus(`✅ ${data.total} profesionales disponibles`, 'success');
         } else {
-            container.innerHTML = '<div class="error">No hay empleados disponibles</div>';
+            container.innerHTML = '<div class="error">No hay profesionales disponibles</div>';
         }
     } catch (error) {
         container.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-        showStatus(`❌ Error cargando empleados: ${error.message}`, 'error');
+        showStatus(`❌ Error cargando profesionales: ${error.message}`, 'error');
     }
 }
 
@@ -148,25 +164,25 @@ function closeModal() {
 // =====================
 
 async function showCreateDepartmentForm() {
-    const suggestedDepartments = ['General Dentistry', 'Pediatric Dentistry', 'Restorative Dentistry', 'Surgery', 'Orthodontics'];
+    const suggestedDepartments = ['Odontología General', 'Odontología Pediátrica', 'Endodoncia', 'Periodoncia', 'Ortodoncia', 'Cirugía Oral', 'Implantología', 'Estética Dental', 'Prostodoncia', 'Radiología Dental'];
     
     const content = `
         <form id="department-form" class="crud-form">
-            <h4>Crear Nuevo Departamento</h4>
+            <h4>Crear Nueva Especialidad</h4>
             <div class="form-group">
-                <label for="dept-name">Nombre del Departamento:</label>
-                <input type="text" id="dept-name" list="dept-suggestions" required maxlength="100" placeholder="Escribir o seleccionar departamento">
+                <label for="dept-name">Nombre de la Especialidad:</label>
+                <input type="text" id="dept-name" list="dept-suggestions" required maxlength="100" minlength="3" pattern="[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+" placeholder="Escribir o seleccionar especialidad" title="Solo letras y espacios, mínimo 3 caracteres">
                 <datalist id="dept-suggestions">
                     ${suggestedDepartments.map(dept => `<option value="${dept}">`).join('')}
                 </datalist>
             </div>
             <div class="form-group">
                 <label for="dept-description">Descripción:</label>
-                <textarea id="dept-description" rows="3" placeholder="Descripción del departamento"></textarea>
+                <textarea id="dept-description" rows="3" maxlength="500" placeholder="Descripción de la especialidad (opcional)"></textarea>
             </div>
             <div class="form-buttons">
                 <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Crear Departamento</button>
+                <button type="submit" class="btn btn-primary">Crear Especialidad</button>
             </div>
         </form>
     `;
@@ -192,9 +208,11 @@ async function createDepartment() {
         });
         
         if (response.success) {
-            showAlert('✅ Departamento creado exitosamente', 'success');
+            showAlert('✅ Especialidad creada exitosamente', 'success');
             closeModal();
             loadDepartments();
+            // Limpiar cache de departamentos para forzar recarga en selects
+            app.allDepartments = [];
         } else {
             showAlert(`❌ Error: ${response.message}`, 'error');
         }
@@ -208,25 +226,25 @@ async function editDepartment(id) {
         const response = await apiRequest(`/api/departments/${id}`);
         const dept = response.data;
         
-        const suggestedDepartments = ['General Dentistry', 'Pediatric Dentistry', 'Restorative Dentistry', 'Surgery', 'Orthodontics'];
+        const suggestedDepartments = ['Odontología General', 'Odontología Pediátrica', 'Endodoncia', 'Periodoncia', 'Ortodoncia', 'Cirugía Oral', 'Implantología', 'Estética Dental', 'Prostodoncia', 'Radiología Dental'];
         
         const content = `
             <form id="department-form" class="crud-form">
-                <h4>Editar Departamento</h4>
+                <h4>Editar Especialidad</h4>
                 <div class="form-group">
-                    <label for="dept-name">Nombre del Departamento:</label>
-                    <input type="text" id="dept-name" list="dept-suggestions" value="${dept.name}" required maxlength="100" placeholder="Escribir o seleccionar departamento">
+                    <label for="dept-name">Nombre de la Especialidad:</label>
+                    <input type="text" id="dept-name" list="dept-suggestions" value="${dept.name}" required maxlength="100" minlength="3" pattern="[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+" placeholder="Escribir o seleccionar especialidad" title="Solo letras y espacios, mínimo 3 caracteres">
                     <datalist id="dept-suggestions">
                         ${suggestedDepartments.map(d => `<option value="${d}">`).join('')}
                     </datalist>
                 </div>
                 <div class="form-group">
                     <label for="dept-description">Descripción:</label>
-                    <textarea id="dept-description" rows="3">${dept.description || ''}</textarea>
+                    <textarea id="dept-description" rows="3" maxlength="500">${dept.description || ''}</textarea>
                 </div>
                 <div class="form-buttons">
                     <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Actualizar Departamento</button>
+                    <button type="submit" class="btn btn-success">Actualizar Especialidad</button>
                 </div>
             </form>
         `;
@@ -256,9 +274,11 @@ async function updateDepartment(id) {
         });
         
         if (response.success) {
-            showAlert('✅ Departamento actualizado exitosamente', 'success');
+            showAlert('✅ Especialidad actualizada exitosamente', 'success');
             closeModal();
             loadDepartments();
+            // Limpiar cache de departamentos para forzar recarga en selects
+            app.allDepartments = [];
         } else {
             showAlert(`❌ Error: ${response.message}`, 'error');
         }
@@ -268,7 +288,7 @@ async function updateDepartment(id) {
 }
 
 async function deleteDepartment(id) {
-    if (!confirm('¿Estás seguro de que quieres eliminar este departamento?')) {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta especialidad?')) {
         return;
     }
     
@@ -278,8 +298,10 @@ async function deleteDepartment(id) {
         });
         
         if (response.success) {
-            showAlert('✅ Departamento eliminado exitosamente', 'success');
+            showAlert('✅ Especialidad eliminada exitosamente', 'success');
             loadDepartments();
+            // Limpiar cache de departamentos para forzar recarga en selects
+            app.allDepartments = [];
         } else {
             showAlert(`❌ Error: ${response.message}`, 'error');
         }
@@ -298,33 +320,33 @@ async function showCreateEmployeeForm() {
     
     const content = `
         <form id="employee-form" class="crud-form">
-            <h4>Crear Nuevo Empleado</h4>
+            <h4>Crear Nuevo Profesional</h4>
             <div class="form-group">
                 <label for="emp-firstName">Nombre:</label>
-                <input type="text" id="emp-firstName" required>
+                <input type="text" id="emp-firstName" required minlength="2" maxlength="50" pattern="[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+" placeholder="Nombre del profesional" title="Solo letras y espacios, mínimo 2 caracteres">
             </div>
             <div class="form-group">
                 <label for="emp-lastName">Apellido:</label>
-                <input type="text" id="emp-lastName" required>
+                <input type="text" id="emp-lastName" required minlength="2" maxlength="50" pattern="[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+" placeholder="Apellido del profesional" title="Solo letras y espacios, mínimo 2 caracteres">
             </div>
             <div class="form-group">
-                <label for="emp-department">Departamento:</label>
+                <label for="emp-department">Especialidad:</label>
                 <select id="emp-department" required>
-                    <option value="">Seleccionar departamento</option>
-                    ${app.departments.map(dept => `<option value="${dept._id}">${dept.name}</option>`).join('')}
+                    <option value="">Seleccionar especialidad</option>
+                    ${app.allDepartments.map(dept => `<option value="${dept._id}">${dept.name}</option>`).join('')}
                 </select>
             </div>
             <div class="form-group">
-                <label for="emp-position">Posición:</label>
-                <input type="text" id="emp-position" placeholder="Ej: Dentista General">
+                <label for="emp-position">Cargo:</label>
+                <input type="text" id="emp-position" maxlength="100" pattern="[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+" placeholder="Ej: Odontólogo General, Especialista en Endodoncia" title="Solo letras y espacios">
             </div>
             <div class="form-group">
                 <label for="emp-email">Email:</label>
-                <input type="email" id="emp-email" placeholder="empleado@apollonia.com">
+                <input type="email" id="emp-email" maxlength="100" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" placeholder="profesional@apollonia.com" title="Formato de email válido">
             </div>
             <div class="form-buttons">
                 <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Crear Empleado</button>
+                <button type="submit" class="btn btn-primary">Crear Profesional</button>
             </div>
         </form>
     `;
@@ -353,7 +375,7 @@ async function createEmployee() {
         });
         
         if (response.success) {
-            showAlert('✅ Empleado creado exitosamente', 'success');
+            showAlert('✅ Profesional creado exitosamente', 'success');
             closeModal();
             loadEmployees();
         } else {
@@ -374,32 +396,32 @@ async function editEmployee(id) {
         
         const content = `
             <form id="employee-form" class="crud-form">
-                <h4>Editar Empleado</h4>
+                <h4>Editar Profesional</h4>
                 <div class="form-group">
                     <label for="emp-firstName">Nombre:</label>
-                    <input type="text" id="emp-firstName" value="${emp.firstName}" required>
+                    <input type="text" id="emp-firstName" value="${emp.firstName}" required minlength="2" maxlength="50" pattern="[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+" placeholder="Nombre del profesional" title="Solo letras y espacios, mínimo 2 caracteres">
                 </div>
                 <div class="form-group">
                     <label for="emp-lastName">Apellido:</label>
-                    <input type="text" id="emp-lastName" value="${emp.lastName}" required>
+                    <input type="text" id="emp-lastName" value="${emp.lastName}" required minlength="2" maxlength="50" pattern="[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+" placeholder="Apellido del profesional" title="Solo letras y espacios, mínimo 2 caracteres">
                 </div>
                 <div class="form-group">
-                    <label for="emp-department">Departamento:</label>
+                    <label for="emp-department">Especialidad:</label>
                     <select id="emp-department" required>
-                        ${app.departments.map(dept => `<option value="${dept._id}" ${dept._id === emp.department._id ? 'selected' : ''}>${dept.name}</option>`).join('')}
+                        ${app.allDepartments.map(dept => `<option value="${dept._id}" ${dept._id === emp.department._id ? 'selected' : ''}>${dept.name}</option>`).join('')}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="emp-position">Posición:</label>
-                    <input type="text" id="emp-position" value="${emp.position || ''}">
+                    <label for="emp-position">Cargo:</label>
+                    <input type="text" id="emp-position" value="${emp.position || ''}" maxlength="100" pattern="[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+" placeholder="Ej: Odontólogo General, Especialista en Endodoncia" title="Solo letras y espacios">
                 </div>
                 <div class="form-group">
                     <label for="emp-email">Email:</label>
-                    <input type="email" id="emp-email" value="${emp.email || ''}">
+                    <input type="email" id="emp-email" value="${emp.email || ''}" maxlength="100" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" placeholder="profesional@apollonia.com" title="Formato de email válido">
                 </div>
                 <div class="form-buttons">
                     <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Actualizar Empleado</button>
+                    <button type="submit" class="btn btn-success">Actualizar Profesional</button>
                 </div>
             </form>
         `;
@@ -432,7 +454,7 @@ async function updateEmployee(id) {
         });
         
         if (response.success) {
-            showAlert('✅ Empleado actualizado exitosamente', 'success');
+            showAlert('✅ Profesional actualizado exitosamente', 'success');
             closeModal();
             loadEmployees();
         } else {
@@ -444,7 +466,7 @@ async function updateEmployee(id) {
 }
 
 async function deleteEmployee(id) {
-    if (!confirm('¿Estás seguro de que quieres eliminar este empleado?')) {
+    if (!confirm('¿Estás seguro de que quieres eliminar este profesional?')) {
         return;
     }
     
@@ -454,7 +476,7 @@ async function deleteEmployee(id) {
         });
         
         if (response.success) {
-            showAlert('✅ Empleado eliminado exitosamente', 'success');
+            showAlert('✅ Profesional eliminado exitosamente', 'success');
             loadEmployees();
         } else {
             showAlert(`❌ Error: ${response.message}`, 'error');
@@ -468,13 +490,38 @@ async function deleteEmployee(id) {
 // FUNCIONES AUXILIARES
 // =====================
 
+// Función para crear controles de paginación
+function createPaginationControls(data, type) {
+    if (data.totalPages <= 1) return '';
+    
+    let html = '<div class="pagination-controls">';
+    
+    // Botón anterior
+    if (data.hasPrevPage) {
+        html += `<button onclick="load${type === 'especialidades' ? 'Departments' : 'Employees'}(${data.currentPage - 1})" class="btn btn-secondary btn-small">« Anterior</button>`;
+    }
+    
+    // Información de página
+    html += `<span class="page-info">Página ${data.currentPage} de ${data.totalPages} (${data.total} total)</span>`;
+    
+    // Botón siguiente
+    if (data.hasNextPage) {
+        html += `<button onclick="load${type === 'especialidades' ? 'Departments' : 'Employees'}(${data.currentPage + 1})" class="btn btn-secondary btn-small">Siguiente »</button>`;
+    }
+    
+    html += '</div>';
+    return html;
+}
+
 async function loadDepartmentsForSelect() {
-    if (app.departments.length === 0) {
+    if (app.allDepartments.length === 0) {
         try {
-            const data = await apiRequest('/api/departments');
-            app.departments = data.data;
+            const data = await apiRequest('/api/departments?limit=100');
+            app.allDepartments = data.data || [];
+            console.log(`Cargadas ${app.allDepartments.length} especialidades para selección`);
         } catch (error) {
-            console.error('Error cargando departamentos:', error);
+            console.error('Error cargando especialidades para select:', error);
+            app.allDepartments = [];
         }
     }
 }

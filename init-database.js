@@ -18,23 +18,23 @@ const initializeDatabase = async () => {
     // Crear departamentos
     const departments = [
       {
-        name: 'General Dentistry',
+        name: 'Odontología General',
         description: 'Atención dental general y preventiva'
       },
       {
-        name: 'Pediatric Dentistry',
+        name: 'Odontología Pediátrica',
         description: 'Especialización en odontología infantil'
       },
       {
-        name: 'Restorative Dentistry',
+        name: 'Odontología Restauradora',
         description: 'Restauración y rehabilitación dental'
       },
       {
-        name: 'Surgery',
+        name: 'Cirugía',
         description: 'Cirugía oral y maxilofacial'
       },
       {
-        name: 'Orthodontics',
+        name: 'Ortodoncia',
         description: 'Corrección de malposiciones dentales'
       }
     ];
@@ -45,53 +45,74 @@ const initializeDatabase = async () => {
     // Crear empleados de ejemplo
     const employees = [
       {
-        firstName: 'Lisa',
-        lastName: 'Harris',
-        department: createdDepartments[2]._id, // Restorative Dentistry
-        position: 'Restorative Dentist',
-        email: 'lisa.harris@apollonia.com'
+        firstName: 'Carmen',
+        lastName: 'García López',
+        department: createdDepartments[2]._id, // Odontología Restauradora
+        position: 'Odontóloga Restauradora',
+        email: 'carmen.garcia@apollonia.com'
       },
       {
-        firstName: 'Alfred',
-        lastName: 'Christensen',
-        department: createdDepartments[0]._id, // General Dentistry
-        position: 'General Dentist',
-        email: 'alfred.christensen@apollonia.com'
+        firstName: 'Alejandro',
+        lastName: 'Martínez Ruiz',
+        department: createdDepartments[0]._id, // Odontología General
+        position: 'Odontólogo General',
+        email: 'alejandro.martinez@apollonia.com'
       },
       {
-        firstName: 'John',
-        lastName: 'Dudley',
-        department: createdDepartments[0]._id, // General Dentistry
-        position: 'General Dentist',
-        email: 'john.dudley@apollonia.com'
+        firstName: 'Francisco',
+        lastName: 'Hernández Silva',
+        department: createdDepartments[0]._id, // Odontología General
+        position: 'Odontólogo General',
+        email: 'francisco.hernandez@apollonia.com'
       },
       {
-        firstName: 'Danny',
-        lastName: 'Perez',
-        department: createdDepartments[2]._id, // Restorative Dentistry
-        position: 'Dental Technician',
-        email: 'danny.perez@apollonia.com'
+        firstName: 'Isabel',
+        lastName: 'Fernández Castro',
+        department: createdDepartments[2]._id, // Odontología Restauradora
+        position: 'Técnica Dental',
+        email: 'isabel.fernandez@apollonia.com'
       },
       {
-        firstName: 'Sarah',
-        lastName: 'Alvarez',
-        department: createdDepartments[1]._id, // Pediatric Dentistry
-        position: 'Pediatric Dentist',
-        email: 'sarah.alvarez@apollonia.com'
+        firstName: 'Pilar',
+        lastName: 'Rodríguez Moreno',
+        department: createdDepartments[1]._id, // Odontología Pediátrica
+        position: 'Odontóloga Pediátrica',
+        email: 'pilar.rodriguez@apollonia.com'
       },
       {
-        firstName: 'Michael',
-        lastName: 'Rodriguez',
-        department: createdDepartments[3]._id, // Surgery
-        position: 'Oral Surgeon',
-        email: 'michael.rodriguez@apollonia.com'
+        firstName: 'Miguel',
+        lastName: 'Jiménez Vázquez',
+        department: createdDepartments[3]._id, // Cirugía
+        position: 'Cirujano Oral',
+        email: 'miguel.jimenez@apollonia.com'
       },
       {
-        firstName: 'Emma',
-        lastName: 'Thompson',
-        department: createdDepartments[4]._id, // Orthodontics
-        position: 'Orthodontist',
-        email: 'emma.thompson@apollonia.com'
+        firstName: 'Ana',
+        lastName: 'López Sánchez',
+        department: createdDepartments[4]._id, // Ortodoncia
+        position: 'Ortodoncista',
+        email: 'ana.lopez@apollonia.com'
+      },
+      {
+        firstName: 'Carlos',
+        lastName: 'Morales Díaz',
+        department: createdDepartments[0]._id, // Odontología General
+        position: 'Higienista Dental',
+        email: 'carlos.morales@apollonia.com'
+      },
+      {
+        firstName: 'Lucía',
+        lastName: 'Pérez Romero',
+        department: createdDepartments[1]._id, // Odontología Pediátrica
+        position: 'Auxiliar de Clínica',
+        email: 'lucia.perez@apollonia.com'
+      },
+      {
+        firstName: 'Javier',
+        lastName: 'Torres Muñoz',
+        department: createdDepartments[3]._id, // Cirugía
+        position: 'Anestesista',
+        email: 'javier.torres@apollonia.com'
       }
     ];
 
