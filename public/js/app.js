@@ -202,6 +202,17 @@ async function createDepartment() {
     };
     
     try {
+        // First check if department already exists
+        const existingDepartments = await apiRequest('/api/departments');
+        const departmentExists = existingDepartments.data.some(
+            dept => dept.name.toLowerCase() === formData.name.toLowerCase()
+        );
+        
+        if (departmentExists) {
+            showAlert('❌ Ya existe una especialidad con ese nombre', 'error');
+            return;
+        }
+        
         const response = await apiRequest('/api/departments', {
             method: 'POST',
             body: JSON.stringify(formData)

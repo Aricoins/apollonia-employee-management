@@ -6,9 +6,9 @@ require('dotenv').config();
 const initializeDatabase = async () => {
   try {
     // Conectar a MongoDB
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/apollonia_db';
+    const mongoURI = process.env.MONGODB_ATLAS_URI || process.env.MONGODB_URI || 'mongodb://localhost:27017/apollonia_db';
     await mongoose.connect(mongoURI);
-    console.log('✅ Conectado a MongoDB');
+    console.log('✅ Conectado a MongoDB:', mongoURI);
 
     // Limpiar datos existentes
     await Department.deleteMany({});
