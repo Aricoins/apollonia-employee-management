@@ -13,19 +13,33 @@ app.use(express.urlencoded({ extended: true }));
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Conectar a MongoDB (solo si los archivos existen)
+// Conectar a MongoDB
 let dbConnected = false;
-try {
-  const connectDB = require('./app/config/database');
-  connectDB().then(() => {
-    dbConnected = true;
-    console.log('✅ Base de datos conectada y lista');
-  }).catch(err => {
-    console.log('⚠️  Ejecutando sin base de datos:', err.message);
-  });
-} catch (error) {
-  console.log('⚠️  Archivos de base de datos no encontrados, ejecutando sin DB');
-}
+let dbConnection = null;
+
+const { connectDB } = require('./app/config/database');
+
+const initDatabase = async () => {
+  try {
+    dbConnection = await connectDB();
+    if (dbConnection) {
+      dbConnected = true;
+      console.log('✅ Base de datos conectada y lista');
+    } else {
+      throw new Error('No se pudo establecer la conexión');
+    }
+  } catch (error) {
+    console.log('⚠️  Error al conectar a la base de datos:', error.message);
+    if (process.env.NODE_ENV === 'production') {
+      throw error;
+    } else {
+      console.log('⚠️  Ejecutando en modo fallback');
+    }
+  }
+};
+
+// Inicializar la base de datos
+initDatabase();
 
 // Rutas de la API (solo si los controladores existen)
 try {
