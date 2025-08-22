@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const connect = async () => {
+  try {
   // Configurar opciones de conexión optimizadas para producción
   const options = {
     useNewUrlParser: true,
